@@ -1,33 +1,33 @@
 import { AmplifyAuthenticator } from '@aws-amplify/ui-react'
-import { Amplify, API, Auth, withSSRContext } from "aws-amplify";
-import awsExports from "../src/aws-exports";
-import { createPost } from "../src/graphql/mutations";
-import { listPosts } from "../src/graphql/queries";
+import { Amplify, API, Auth, withSSRContext } from "aws-amplify"
+import awsExports from "../src/aws-exports"
+import { createPost } from "../src/graphql/mutations"
+import { listPosts } from "../src/graphql/queries"
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps } from 'next'
 
-Amplify.configure({ ...awsExports, ssr: true });
+Amplify.configure({ ...awsExports, ssr: true })
 
 export const getServerSideProps: GetServerSideProps = async ({req}) => {
-  const SSR = withSSRContext({ req });
-  const response = await SSR.API.graphql({ query: listPosts });
+  const SSR = withSSRContext({ req })
+  const response = await SSR.API.graphql({ query: listPosts })
 
   return {
     props: {
       posts: response.data.listPosts.items,
     },
-  };
+  }
 }
 
 async function handleCreatePost(event) {
-  event.preventDefault();
+  event.preventDefault()
 
-  const form = new FormData(event.target);
+  const form = new FormData(event.target)
 
   try {
-    const { data } = await API.graphql({
+    const { data } = await API.graphql<any>({
       authMode: "AMAZON_COGNITO_USER_POOLS",
       query: createPost,
       variables: {
@@ -36,12 +36,12 @@ async function handleCreatePost(event) {
           content: form.get("content"),
         },
       },
-    });
+    })
 
-    window.location.href = `/posts/${data.createPost.id}`;
+    window.location.href = `/posts/${data.createPost.id}`
   } catch ({ errors }) {
-    console.error(...errors);
-    throw new Error(errors[0].message);
+    console.error(...errors)
+    throw new Error(errors[0].message)
   }
 }
 
@@ -100,5 +100,5 @@ export default function Home({ posts = [] }) {
         </div>
       </main>
     </div>
-  );
+  )
 }
